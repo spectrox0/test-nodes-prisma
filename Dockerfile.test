@@ -1,0 +1,19 @@
+
+FROM node:18.16 as base
+
+RUN npm i -g pnpm
+
+FROM base as deeps
+
+WORKDIR /usr/src/app
+COPY package*.json  pnpm-lock.yaml .env .env tsconfig.json ./
+
+# COPY
+RUN pnpm i 
+RUN npx prisma generate
+COPY . .
+RUN pnpm build
+
+ENV port 4004
+EXPOSE 4004 
+CMD ["pnpm", "start:dev"]

@@ -22,13 +22,8 @@
       "@/validations/*": ["validations/*"],
       "@/types/*": ["types/*"],
       "@/middlewares/*": ["middlewares/*"]
-    },
-    "include": ["src/**/*", "./src/**/*.ts", "./src/**/*.js"],
-    "exclude": [
-      "node_modules",
-      "dist",
-      "src/**/*.spec.ts",
-      "src/__tests__/**/*"
-    ]
-  }
+    }
+  },
+  "include": ["src/**/*", "./src/**/*.ts", "./src/**/*.js"],
+  "exclude": ["node_modules", "dist", "src/**/*.spec.ts", "src/__tests__/**/*"]
 }

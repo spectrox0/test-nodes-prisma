@@ -1,17 +1,11 @@
-import { User } from "./user.model";
+import type { User } from "./user.model";
+import type {
+  Menu as MenuPrisma,
+  MenusToUser as MenusToUserPrisma,
+} from "@prisma/client";
 
-export type Menu = {
-  id: number;
-  name: string;
-  parentId?: number | null;
+export interface Menu extends MenuPrisma {
   status: 0 | 1;
-  parent?: Menu | null;
-  children: Menu[];
-};
+}
 
-export type MenusToUser = {
-  menuId: number;
-  userId: number;
-  menu: Menu;
-  user: User;
-};
+export type MenustoUser = MenusToUserPrisma;

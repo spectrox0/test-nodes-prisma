@@ -9,8 +9,7 @@ const schema = zod.object({
 });
 
 // Singleton config object to store all the configuration variables in the application
-export const config: typeof schema._type = {
-  PORT: process.env.PORT as string,
-  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY as string,
-  
-};
+export const config: typeof schema._type = schema.parse({
+  PORT: process.env.PORT,
+  JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
+});

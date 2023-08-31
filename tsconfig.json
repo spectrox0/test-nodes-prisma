@@ -10,18 +10,18 @@
     "outDir": "dist",
     "sourceMap": true,
     "allowJs": true,
-    "baseUrl": "./src",
+    "baseUrl": "./src/",
     "paths": {
       "@/*": ["*"],
-      "@/config/*": ["config/*"],
-      "@/controllers/*": ["controllers/*"],
-      "@/models/*": ["models/*"],
-      "@/routes/*": ["routes/*"],
-      "@/services/*": ["services/*"],
-      "@/utils/*": ["utils/*"],
-      "@/validations/*": ["validations/*"],
-      "@/types/*": ["types/*"],
-      "@/middlewares/*": ["middlewares/*"]
+      "@/config/*": ["./config/*"],
+      "@/controllers/*": ["./controllers/*"],
+      "@/models/*": ["./models/*"],
+      "@/routes/*": ["./routes/*"],
+      "@/services/*": ["./services/*"],
+      "@/utils/*": ["./utils/*"],
+      "@/validations/*": ["./validations/*"],
+      "@/types/*": ["./types/*"],
+      "@/middlewares/*": ["./middlewares/*"]
     }
   },
   "include": ["src/**/*", "./src/**/*.ts", "./src/**/*.js"],

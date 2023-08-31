@@ -2,12 +2,9 @@ import MenuService from "@/services/menu.service";
 import type { RequestHandler } from "express";
 
 const getMenu: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  //if id is not provided, return error
-  if (!id)
-    return res.status(400).send({
-      message: "Id is required",
-    });
+  const { id: id_ } = req.params;
+  const id = Number(id_);
+  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
 
   //get menu from database
   try {

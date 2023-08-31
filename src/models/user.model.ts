@@ -1,9 +1,4 @@
-export type User = {
-  id: number;
-  username: string;
-  name: string;
-  lastName: string;
-  email: string;
-  password: string;
-  status: 0 | 1;
-};
+import type { User as UserPrisma } from "@prisma/client";
+export interface User extends UserPrisma {
+  status: 1 | 0;
+}

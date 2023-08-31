@@ -3,6 +3,9 @@ import { config } from "config";
 import helmet from "helmet";
 import cors from "cors";
 import * as Routes from "routes";
+
+// Instance client of database when the server starts
+import "./config/database";
 //Instance of express
 const app = express();
 //Include all routes

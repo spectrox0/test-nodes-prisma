@@ -1,6 +1,6 @@
 import UsersService from "@/services/users.service";
 import type { RequestHandler } from "express";
-import { hashPassword, signJwt, verifyJwt, verifyPassword } from "utils";
+import { hashPassword, signJwt, verifyPassword } from "utils";
 
 // Login Controller
 const login: RequestHandler = async (req, res) => {

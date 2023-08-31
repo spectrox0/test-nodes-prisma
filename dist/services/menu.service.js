@@ -1,19 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const create = async () => {
-    return {};
+const config_1 = require("../config");
+const create = async (payload) => {
+    //Create Menu in database with Prisma ORM
+    const menu = await config_1.prisma.menu.create({
+        data: Object.assign(payload, { status: 1 }),
+    });
+    return menu;
 };
-const delete_ = async () => {
-    return {};
+const delete_ = async (id) => {
+    const menu = await config_1.prisma.menu.update({
+        where: { id },
+        data: { status: 0 },
+    });
+    return menu;
 };
-const update = async () => {
-    return {};
+const update = async (id, payload) => {
+    const menu = await config_1.prisma.menu.update({
+        where: { id },
+        data: payload,
+    });
+    return menu;
 };
-const get = async () => {
-    return {};
+const get = async (id, status = 1) => {
+    const menu = await config_1.prisma.menu.findUnique({ where: { id, status } });
+    return menu;
 };
 const getAll = async () => {
-    return [];
+    const menus = await config_1.prisma.menu.findMany({ where: { status: 1 } });
+    return menus;
 };
 //Singleton pattern
 const MenuService = Object.freeze({

@@ -1,20 +1,13 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 import { config } from "config";
+
 export const signJwt = (payload: Object, options: SignOptions = {}) => {
-  const privateKey = Buffer.from(config.JWT_SECRET_KEY, "base64").toString(
-    "ascii"
-  );
-  return jwt.sign(payload, privateKey, {
-    algorithm: "RS256",
-  });
+  return jwt.sign(payload, config.JWT_SECRET_KEY, options);
 };
 
 export const verifyJwt = <T>(token: string): T | null => {
   try {
-    const publicKey = Buffer.from(config.JWT_SECRET_KEY, "base64").toString(
-      "ascii"
-    );
-    return jwt.verify(token, publicKey) as T;
+    return jwt.verify(token, config.JWT_SECRET_KEY) as T;
   } catch (error) {
     return null;
   }

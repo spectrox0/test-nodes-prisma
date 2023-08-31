@@ -3,17 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
 //Routes express.js to menu controller
 const menu_controller_1 = __importDefault(require("../controllers/menu.controller"));
 const express_1 = require("express");
 const middlewares_1 = require("../middlewares");
-const baseRoute = "menus";
-const router = (0, express_1.Router)();
+exports.router = (0, express_1.Router)();
 //Routes express.js to menu controller
-router.get(`${baseRoute}/:id`, middlewares_1.isAuthenticated, menu_controller_1.default.getMenu);
-router.get(`${baseRoute}/`, middlewares_1.isAuthenticated, menu_controller_1.default.getAllMenus);
-router.post(`${baseRoute}/`, middlewares_1.isAuthenticated, menu_controller_1.default.createMenu);
-router.delete(`${baseRoute}/:id`, middlewares_1.isAuthenticated, menu_controller_1.default.deleteMenu);
-router.put(`${baseRoute}/:id`, middlewares_1.isAuthenticated, menu_controller_1.default.updateMenu);
-exports.default = router;
+exports.router.get(`/:id`, middlewares_1.isAuthenticated, menu_controller_1.default.getMenu);
+exports.router.get("/", middlewares_1.isAuthenticated, menu_controller_1.default.getAllMenus);
+exports.router.post("/", middlewares_1.isAuthenticated, menu_controller_1.default.createMenu);
+exports.router.delete("/:id", middlewares_1.isAuthenticated, menu_controller_1.default.deleteMenu);
+exports.router.put("/:id", middlewares_1.isAuthenticated, menu_controller_1.default.updateMenu);
 //# sourceMappingURL=menu.routes.js.map

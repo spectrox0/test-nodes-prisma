@@ -2,14 +2,12 @@
 import UsersController from "@/controllers/users.controller";
 import { Router } from "express";
 
-const baseRoute = "menus";
-const router = Router();
+const baseRoute = "users";
+export const router = Router();
 
 //Routes express.js to menu controller
-router.get(`${baseRoute}/:id`, UsersController.getUser);
-router.get(`${baseRoute}/`, UsersController.getAllUsers);
-router.post(`${baseRoute}/`, UsersController.createUser);
-router.delete(`${baseRoute}/:id`, UsersController.deleteUser);
-router.put(`${baseRoute}/:id`, UsersController.updateUser);
+router.get("/:id", UsersController.getUser);
+router.get("/", UsersController.getAllUsers);
 
-export default router;
+router.delete("/:id", UsersController.deleteUser);
+router.put("/:id", UsersController.updateUser);

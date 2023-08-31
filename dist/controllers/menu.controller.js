@@ -5,12 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const menu_service_1 = __importDefault(require("../services/menu.service"));
 const getMenu = async (req, res) => {
-    const { id } = req.params;
-    //if id is not provided, return error
-    if (!id)
-        return res.status(400).send({
-            message: "Id is required",
-        });
+    const { id: id_ } = req.params;
+    const id = Number(id_);
+    if (isNaN(id))
+        return res.status(400).send({ message: "Id is not valid" });
     //get menu from database
     try {
         const menu = await menu_service_1.default.get(id);
@@ -28,8 +26,9 @@ const getMenu = async (req, res) => {
 };
 const getAllMenus = async (req, res) => {
     try {
+        return res.status(200).send({ message: "Menus found", data: [] });
         const menus = await menu_service_1.default.getAll();
-        res.status(200).send(menus);
+        return res.status(200).send({ message: "Menus found", data: menus });
     }
     catch (error) {
         return res.status(500).send({

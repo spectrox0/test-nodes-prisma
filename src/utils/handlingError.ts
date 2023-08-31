@@ -9,7 +9,7 @@ export class AuthenticationError extends Error {
   }
 }
 
-export const errorHandler: ErrorHandler = (err, req, res, next) => {
+export const errorHandler: ErrorHandler = (err, _req, res, _next) => {
   if (err instanceof AuthenticationError) {
     return res.status(err.statusCode).json({ message: err.message });
   }

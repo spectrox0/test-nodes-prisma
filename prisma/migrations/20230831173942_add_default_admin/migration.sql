@@ -43,6 +43,8 @@ ALTER TABLE `MenusToUser` ADD CONSTRAINT `MenusToUser_userId_fkey` FOREIGN KEY (
 
 
 -- Include default user admin
-INSERT INTO `User` (`username`, `password`, `name`, `lastname`, `email`, `status`) VALUES ('admin', 'admin', 'Admin', 'Admin', 'admin@example.com', 1);
+
+-- password: admin hashed with bcrypt
+INSERT INTO `User` (`username`, `password`, `name`, `lastname`, `email`, `status`) VALUES ('admin', '$2a$10$81bpaVIPg2sz9UQyMCVFDeKYFkKKd2N/dx1JgIgKpTQBQDQIwEqku', 'Admin', 'Admin', 'admin@example.com', 1);
 
 

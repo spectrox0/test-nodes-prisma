@@ -22,7 +22,6 @@ const create: Service["create"] = async ({
       status: 1,
     },
   });
-  if (!user) throw new Error("Error while creating user");
 
   return user as User;
 };
@@ -33,7 +32,6 @@ const delete_: Service["delete"] = async id => {
     where: { id, status: 1 },
     data: { status: 0 },
   });
-  if (!user) throw new Error("Error while deleting user");
   return user as User;
 };
 
@@ -48,7 +46,6 @@ const update: Service["update"] = async (id, payload) => {
 const get: Service["get"] = async (id, status = 1) => {
   //Get the user by id in DB with ORM Prisma
   const user = await prisma.user.findUnique({ where: { id, status } });
-  if (!user) throw new Error("User not found");
   return user as User;
 };
 

@@ -7,7 +7,7 @@ export const hashPassword = async (password: string): Promise<string> => {
 
   return hash;
 };
-
+console.log("admin", hashPassword("admin"));
 export const verifyPassword = async (
   password: string,
   hash: string

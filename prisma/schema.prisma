@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
 }
 
@@ -12,35 +9,34 @@ datasource db {
 }
 
 model Menu {
-  id        Int   @id @default(autoincrement())
-  name      String @unique
-  parentId  Int?  // foreign key
-  status    Int   @default(0)
-
-  // Relations
-  parent    Menu?  @relation(name: "ChildToParent", fields: [parentId], references: [id])
-  children  Menu[] @relation(name: "ChildToParent")
-
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  parentId    Int?
+  status      Int           @default(0)
+  parent      Menu?         @relation("ChildToParent", fields: [parentId], references: [id])
+  children    Menu[]        @relation("ChildToParent")
   menusToUser MenusToUser[]
-}
-model User {
-  id        Int    @id @default(autoincrement())
-  username  String @unique
-  name      String
-  lastname  String
-  email     String @unique
-  password  String
-  status    Int    @default(0)
 
+  @@index([parentId], map: "Menu_parentId_fkey")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  username    String        @unique
+  name        String
+  lastname    String
+  email       String        @unique
+  password    String
+  status      Int           @default(0)
   menusToUser MenusToUser[]
 }
 
 model MenusToUser {
-  menuId  Int
-  userId  Int
+  menuId Int
+  userId Int
+  menu   Menu @relation(fields: [menuId], references: [id])
+  user   User @relation(fields: [userId], references: [id])
 
-  menu    Menu  @relation(fields: [menuId], references: [id])
-  user    User  @relation(fields: [userId], references: [id])
-  
   @@id([menuId, userId])
+  @@index([userId], map: "MenusToUser_userId_fkey")
 }

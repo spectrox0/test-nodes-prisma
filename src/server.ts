@@ -4,14 +4,24 @@ import helmet from "helmet";
 import cors from "cors";
 import { AuthenticationRoutes, MenuRoutes, UsersRoutes } from "routes";
 import "@/config/database";
+import exp from "constants";
 export const bootstrap = (port = config.PORT) => {
   //Instance of express
   const app = express();
 
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-  app.use(helmet());
-  app.use(cors());
+  // Include all middlewares
+  [
+    // Body Parse
+    express.json(),
+    // Parse application/x-www-form-urlencoded
+    express.urlencoded({ extended: true }),
+    // Helmet helps you secure your Express apps by setting various HTTP headers.
+    helmet(),
+    // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
+    cors(),
+  ]
+    // Add middlewares to express app instance
+    .forEach(middleware => app.use(middleware));
   //Include all routes
 
   const addRoute = (baseApi: string, route: Router) => {

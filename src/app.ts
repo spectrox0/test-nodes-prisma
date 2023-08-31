@@ -13,6 +13,7 @@ const baseApiName = "/api";
 app.use(baseApiName, routes);
 
 //Middlewares to parse the request body
+//body parser, helmet and cors
 [express.json, helmet, cors].forEach(middleware => app.use(middleware()));
 
 app.listen(config.PORT, () => {

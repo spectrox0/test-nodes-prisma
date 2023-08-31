@@ -8,10 +8,9 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       MYSQL_DATABASE: $MYSQL_DATABASE
-      MYSQL_USER: $MYSQL_USER
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
     ports:
-      - 3306:3306
+      # My sql port local and docker from environment variable
+      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
     volumes:
       - db:/var/lib/mysql
   test_node_api:
@@ -25,7 +24,7 @@ services:
     env_file:
       - .env
     ports:
-      - 3000:3000
+      - 4000:4000
     volumes:
       # This is for development only and should be removed in production environment to avoid exposing the code
       # This allow us to make changes to the code and see the changes without having to rebuild the image

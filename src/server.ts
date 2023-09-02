@@ -4,7 +4,6 @@ import helmet from "helmet";
 import cors from "cors";
 import { AuthenticationRoutes, MenuRoutes, UsersRoutes } from "routes";
 import "@/config/database";
-import exp from "constants";
 export const bootstrap = (port = config.PORT) => {
   //Instance of express
   const app = express();

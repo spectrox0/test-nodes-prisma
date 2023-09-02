@@ -18,14 +18,29 @@ const login: RequestHandler = async (req, res) => {
     }
 
     const token = signJwt({ id: user.id });
-    return res.status(200).json({ token });
+    const { password: _, status: _status, ...userWithoutPassword } = user;
+    return res.status(200).json({ token, user: userWithoutPassword });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error while login" });
   }
 };
+
+const me: RequestHandler = async (req, res) => {
+  const { id } = req.user;
+  try {
+    const user = await UsersService.getUserByField("id", Number(id));
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const { password: _, status: _status, ...userWithoutPassword } = user;
+    return res.status(200).json({ user: userWithoutPassword });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error while getting user" });
+  }
+};
 const AuthenticationController = Object.freeze({
   login,
+  me,
 } as const satisfies Record<string, RequestHandler>);
 
 export default AuthenticationController;

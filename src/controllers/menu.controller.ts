@@ -23,7 +23,6 @@ const getMenu: RequestHandler = async (req, res) => {
 
 const getAllMenus: RequestHandler = async (req, res) => {
   try {
-    return res.status(200).send({ message: "Menus found", data: [] });
     const menus = await MenuService.getAll();
     return res.status(200).send({ message: "Menus found", data: menus });
   } catch (error) {

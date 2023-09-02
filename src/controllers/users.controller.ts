@@ -3,6 +3,8 @@ import { hashPassword, signJwt } from "@/utils";
 import type { RequestHandler } from "express";
 import zod from "zod";
 
+// In this case for the validation of the fields we are going to use zod
+// The requirements of only an example for the OPRATEL work test
 const schema = zod.object({
   username: zod.string().trim().min(4).max(20),
   name: zod.string().trim().min(4).max(20),
@@ -11,9 +13,30 @@ const schema = zod.object({
   password: zod.string().trim().min(8),
 });
 
-const getUser: RequestHandler = async (req, res) => {};
+const getUser: RequestHandler = async (req, res) => {
+  const { id: id_ } = req.params;
+  // check if id is valid
+  const id = Number(id_);
+  if (isNaN(id)) return res.status(400).json({ message: "Id is not valid" });
+  try {
+    const user = await UsersService.get(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json({ message: "User found", data: user });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error while getting user" });
+  }
+};
 
-const getAllUsers: RequestHandler = async (req, res) => {};
+const getAllUsers: RequestHandler = async (req, res) => {
+  try {
+    const users = await UsersService.getAllUsers();
+    return res.status(200).json({ message: "Users found", data: users });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error while getting users" });
+  }
+};
 
 const createUser: RequestHandler = async (req, res) => {
   const { username, name, lastName, email, password } = req.body;

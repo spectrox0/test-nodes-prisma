@@ -12,7 +12,7 @@ services:
       # My sql port local and docker from environment variable
       - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
     volumes:
-      - db:/var/lib/mysql
+      - ./.db:/var/lib/mysql
   test_node_api:
     depends_on:
       - mysql
@@ -29,6 +29,3 @@ services:
       # This is for development only and should be removed in production environment to avoid exposing the code
       # This allow us to make changes to the code and see the changes without having to rebuild the image
       - ./:/usr/src/app
-
-volumes:
-  db:

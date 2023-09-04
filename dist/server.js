@@ -13,10 +13,19 @@ require("./config/database");
 const bootstrap = (port = config_1.config.PORT) => {
     //Instance of express
     const app = (0, express_1.default)();
-    app.use(express_1.default.json());
-    app.use(express_1.default.urlencoded({ extended: true }));
-    app.use((0, helmet_1.default)());
-    app.use((0, cors_1.default)());
+    // Include all middlewares
+    [
+        // Body Parse
+        express_1.default.json(),
+        // Parse application/x-www-form-urlencoded
+        express_1.default.urlencoded({ extended: true }),
+        // Helmet helps you secure your Express apps by setting various HTTP headers.
+        (0, helmet_1.default)(),
+        // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
+        (0, cors_1.default)(),
+    ]
+        // Add middlewares to express app instance
+        .forEach(middleware => app.use(middleware));
     //Include all routes
     const addRoute = (baseApi, route) => {
         app.use(`/api/${baseApi}`, route);

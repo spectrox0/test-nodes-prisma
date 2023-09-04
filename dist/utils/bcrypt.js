@@ -12,6 +12,7 @@ const hashPassword = async (password) => {
     return hash;
 };
 exports.hashPassword = hashPassword;
+console.log("admin", (0, exports.hashPassword)("admin"));
 const verifyPassword = async (password, hash) => {
     const match = await bcrypt_1.default.compare(password, hash);
     return match;

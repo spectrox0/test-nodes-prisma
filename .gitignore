@@ -3,4 +3,4 @@ node_modules
 .env
 
 # Ignore log files and other temporary files created by the system or by users
-db
+.db

@@ -1,6 +1,7 @@
 import { CommonService } from "@/types";
 import { prisma } from "config";
 import { FullUser, Menu, User } from "models";
+import type { MenusToUser } from "@prisma/client";
 // Get the type of the service from the CommonService interface and the User model
 type Service = CommonService<User, FullUser>;
 
@@ -148,21 +149,49 @@ const getAllMenusByUserId = async (id: number, filter?: string, status = 1) => {
 
 const associateMenusToUser = async (
   id: number,
-  menus: number[],
+  newMenuIds: number[],
   status = 1
 ) => {
-  // Associate menus to user in DB with ORM Prisma
-  const menusToUser = await prisma.user
-    .update({
-      where: { id, status },
-      data: {
-        menusToUser: {
-          create: menus.map(menu => ({ menuId: menu })),
-        },
-      },
+  // First, get all menus currently associated with the user
+  const currentMenus = await prisma.user
+    .findUnique({
+      where: { id },
+      select: { menusToUser: { select: { menuId: true } } },
     })
-    .menusToUser();
-  return menusToUser;
+    .then(user => user?.menusToUser.map(menu => menu.menuId));
+
+  if (!currentMenus) throw new Error("User not found");
+
+  // Calculate the menus you need to add and remove
+  const menusToAdd = newMenuIds.filter(menu => !currentMenus.includes(menu));
+  const menusToRemove = currentMenus.filter(menu => !newMenuIds.includes(menu));
+
+  // Prepare delete and create operations
+  const deleteOperations = prisma.menusToUser.deleteMany({
+    where: {
+      AND: [
+        { userId: id },
+        {
+          menuId: {
+            in: menusToRemove,
+          },
+        },
+      ],
+    },
+  });
+
+  const createOperations = prisma.menusToUser.createMany({
+    data: menusToAdd.map(menuId => ({
+      menuId,
+      userId: id,
+    })),
+  });
+
+  // Perform the operations in an atomic transaction
+  await prisma.$transaction([deleteOperations, createOperations]);
+
+  // You can return some information if you need to
+  return { added: menusToAdd, removed: menusToRemove };
 };
 
 //Singleton pattern to export the service object

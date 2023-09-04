@@ -218,11 +218,13 @@ const associateMenusToUser: RequestHandler = async (req, res) => {
     }
 
     const menusToUser = await UsersService.associateMenusToUser(id, menuIDs);
-    if (!menusToUser?.length) {
+    if (!menusToUser.added?.length && !menusToUser.removed?.length) {
       return res
         .status(400)
         .json({ message: "an error occurred while associating the menus" });
     }
+
+    res.status(200).json({ message: "Menus associated", data: menusToUser });
   } catch (error) {
     //Log error
     console.log(error);

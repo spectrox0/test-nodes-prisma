@@ -32,9 +32,14 @@ const get: Service["get"] = async (id, status = 1) => {
   return menu as Menu;
 };
 
-const getAll: Service["getAll"] = async () => {
-  const menus = await prisma.menu.findMany({ where: { status: 1 } });
+const getAll: Service["getAll"] = async (status = 1) => {
+  const menus = await prisma.menu.findMany({ where: { status } });
   return menus as Menu[];
+};
+
+export const getMenuByName = async (name: string) => {
+  const menu = await prisma.menu.findUnique({ where: { name } });
+  return menu as Menu;
 };
 
 //Singleton pattern
@@ -44,6 +49,7 @@ const MenuService = Object.freeze({
   update,
   get,
   getAll,
+  getMenuByName,
 });
 
 export default MenuService;

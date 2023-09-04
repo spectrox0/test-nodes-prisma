@@ -12,7 +12,7 @@ model Menu {
   id          Int           @id @default(autoincrement())
   name        String        @unique
   parentId    Int?
-  status      Int           @default(0)
+  status      Int           @default(1)
   parent      Menu?         @relation("ChildToParent", fields: [parentId], references: [id])
   children    Menu[]        @relation("ChildToParent")
   menusToUser MenusToUser[]
@@ -27,7 +27,7 @@ model User {
   lastname    String
   email       String        @unique
   password    String
-  status      Int           @default(0)
+  status      Int           @default(1)
   menusToUser MenusToUser[]
 }
 

@@ -1,4 +1,5 @@
 import MenuService from "@/services/menu.service";
+import zod from "zod";
 import type { RequestHandler } from "express";
 
 const getMenu: RequestHandler = async (req, res) => {
@@ -13,7 +14,7 @@ const getMenu: RequestHandler = async (req, res) => {
       return res.status(404).send({
         message: "Menu not found",
       });
-    return res.status(200).send(menu);
+    return res.status(200).send({ data: menu, message: "Menu found" });
   } catch (error) {
     return res.status(500).send({
       message: "Error while getting menu",
@@ -31,12 +32,111 @@ const getAllMenus: RequestHandler = async (req, res) => {
     });
   }
 };
+const nameSchema = zod
+  .string({ required_error: "Name is required" })
+  .trim()
+  .min(4)
+  .max(20);
 
-const createMenu: RequestHandler = async (req, res) => {};
+const createMenu: RequestHandler = async (req, res) => {
+  let { name }: { name: string | undefined } = req.body;
 
-const deleteMenu: RequestHandler = async (req, res) => {};
+  try {
+    name = nameSchema.parse(name);
+  } catch (error) {
+    if (error instanceof zod.ZodError) {
+      return res
+        .status(400)
+        .json({ message: error.errors?.[0]?.message || "Server Error" });
+    } else {
+      return res.status(400).json({ message: "Server Error" });
+    }
+  }
 
-const updateMenu: RequestHandler = async (req, res) => {};
+  try {
+    //check if the menu exists  in database
+    const menuExists = await MenuService.getMenuByName(name);
+    if (menuExists)
+      return res.status(400).send({
+        message: "Menu already exists",
+      });
+
+    //create menu in database
+    const menu = await MenuService.create({ name });
+    return res.status(201).send(menu);
+  } catch (error) {
+    return res.status(500).send({
+      message: "Error while creating menu",
+    });
+  }
+};
+
+const deleteMenu: RequestHandler = async (req, res) => {
+  const { id: id_ } = req.params;
+  const id = Number(id_);
+  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
+
+  try {
+    //check if the menu exists  in database
+    const menu = await MenuService.get(id);
+    if (!menu)
+      return res.status(404).send({
+        message: "Menu not found",
+      });
+
+    //delete menu in database
+    await MenuService.delete(id);
+    return res.status(200).send({ message: "Menu deleted" });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Error while deleting menu",
+    });
+  }
+};
+
+const updateMenu: RequestHandler = async (req, res) => {
+  const { id: id_ } = req.params;
+  const id = Number(id_);
+  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
+
+  let { name }: { name: string | undefined } = req.body;
+
+  try {
+    name = nameSchema.parse(name);
+  } catch (error) {
+    if (error instanceof zod.ZodError) {
+      return res
+        .status(400)
+        .json({ message: error.errors?.[0]?.message || "Server Error" });
+    } else {
+      return res.status(400).json({ message: "Server Error" });
+    }
+  }
+
+  try {
+    //check if the menu exists  in database
+    const menuExists = await MenuService.get(id);
+    if (!menuExists)
+      return res.status(404).send({
+        message: "Menu not found",
+      });
+
+    const menuExistsByName = await MenuService.getMenuByName(name);
+    if (menuExistsByName && menuExistsByName.id !== id)
+      return res.status(400).send({
+        message: "Menu with this name already exists",
+      });
+
+    //update menu in database
+    const menu = await MenuService.update(id, { name });
+    return res.status(200).send({ data: menu, message: "Menu updated" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      message: "Error while updating menu",
+    });
+  }
+};
 
 const MenuController = Object.freeze({
   getMenu,

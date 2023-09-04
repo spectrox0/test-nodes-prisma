@@ -1,9 +1,9 @@
 export interface CommonService<T> {
-  create: <P extends Omit<T, "status" | "id">>(
+  create: <P extends Omit<T, "status" | "id" | "parentId">>(
     payload: P
   ) => Promise<Omit<T, "status">>;
   delete: (id: number) => Promise<T>;
-  update: <P extends Omit<T, "id" | "status">>(
+  update: <P extends Partial<Omit<T, "id" | "status">>>(
     id: number,
     payload: P
   ) => Promise<Omit<T, "status">>;

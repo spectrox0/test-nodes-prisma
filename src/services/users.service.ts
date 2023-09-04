@@ -14,11 +14,11 @@ const create: Service["create"] = async ({
   // Create User in DB with ORM Prisma
   const user = await prisma.user.create({
     data: {
-      email: email.toLowerCase(),
+      email: email.toLowerCase().trim(),
       lastname,
       name,
       password,
-      username,
+      username: username.toLowerCase().trim(),
       status: 1,
     },
   });
@@ -45,29 +45,63 @@ const update: Service["update"] = async (id, payload) => {
 
 const get: Service["get"] = async (id, status = 1) => {
   //Get the user by id in DB with ORM Prisma
-  const user = await prisma.user.findUnique({ where: { id, status } });
+  const user = await prisma.user.findUnique({
+    where: { id, status },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      email: true,
+    },
+  });
   return user as User;
 };
 
 const getUserByField = async <T extends keyof User>(
   field: T,
-  value: User[T],
-  status = 1
+  value: User[T]
 ) => {
   //Get the user by field and his value in DB with ORM Prisma
   const user = await prisma.user.findUnique({
     // @ts-ignore
-    where: { [field]: value, status },
+    where: { [field]: value },
   });
   return user;
+};
+
+const getUserByEmailOrUsername = async ({
+  email,
+  username,
+}: {
+  email?: string;
+  username?: string;
+}) => {
+  // Get the user by email or username in DB with ORM Prisma
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        email ? { email: email.toLowerCase?.() } : {},
+        username ? { username: username.toLowerCase?.() } : {},
+      ],
+    },
+  });
+  return user as User;
 };
 
 // Not pagination yet and not filtering
 const getAllUsers = async () => {
   const users = await prisma.user.findMany({
     where: { status: 1 },
+    select: {
+      id: true,
+      name: true,
+      lastname: true,
+      username: true,
+      email: true,
+    },
   });
-  return users;
+  return users as User[];
 };
 
 //Singleton pattern to export the service object
@@ -77,6 +111,7 @@ const UsersService = Object.freeze({
   update,
   get,
   getUserByField,
+  getUserByEmailOrUsername,
   getAllUsers,
 } as const);
 export default UsersService;

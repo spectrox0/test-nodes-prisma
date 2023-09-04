@@ -99,6 +99,12 @@ const deleteMenu: RequestHandler = async (req, res) => {
         message: "Menu not found",
       });
 
+    // Check if the menu has children
+    if (menu?.children)
+      return res.status(400).send({
+        message: "Menu has children and cannot be deleted",
+      });
+
     //delete menu in database
     await MenuService.delete(id);
     return res.status(200).send({ message: "Menu deleted" });

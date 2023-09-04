@@ -32,8 +32,15 @@ const get: Service["get"] = async (id, status = 1) => {
   //Get the menu by id in database with ORM Prisma with its parent
   const menu = await prisma.menu.findUnique({
     where: { id, status },
-    select: { name: true, id: true, parent: true, parentId: true },
+    select: {
+      name: true,
+      id: true,
+      parent: true,
+      parentId: true,
+      children: true,
+    },
   });
+
   return menu as FullMenu;
 };
 

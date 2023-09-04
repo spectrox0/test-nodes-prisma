@@ -104,11 +104,11 @@ const getAllUsers = async () => {
   return users as FullUser[];
 };
 
-const getAllUsersWithFilter = async (filter: string) => {
+const getAllUsersWithFilter = async (filter: string, status = 1) => {
   //Get all users with filter in DB with ORM Prisma , filter by name, lastname, username and email and sorted by username
   const users = await prisma.user.findMany({
     where: {
-      status: 1,
+      status,
       OR: [
         { name: { contains: filter } },
         { lastname: { contains: filter } },
@@ -129,11 +129,11 @@ const getAllUsersWithFilter = async (filter: string) => {
   return users as User[];
 };
 
-const getAllMenusByUserId = async (id: number, filter?: string) => {
+const getAllMenusByUserId = async (id: number, filter?: string, status = 1) => {
   //Get all menus by user id in DB with ORM Prisma
   const menus = await prisma.user
     .findUnique({
-      where: { id },
+      where: { id, status },
       select: { menusToUser: { select: { menu: true } } },
     })
     .then(user => user?.menusToUser.map(menu => menu.menu));
@@ -146,11 +146,15 @@ const getAllMenusByUserId = async (id: number, filter?: string) => {
   return filteredMenus as Menu[];
 };
 
-const associateMenusToUser = async (id: number, menus: number[]) => {
+const associateMenusToUser = async (
+  id: number,
+  menus: number[],
+  status = 1
+) => {
   // Associate menus to user in DB with ORM Prisma
   const menusToUser = await prisma.user
     .update({
-      where: { id },
+      where: { id, status },
       data: {
         menusToUser: {
           create: menus.map(menu => ({ menuId: menu })),

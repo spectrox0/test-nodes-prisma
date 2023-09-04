@@ -190,14 +190,16 @@ const updateUser: RequestHandler = async (req, res) => {
 };
 
 const associateMenusToUser: RequestHandler = async (req, res) => {
-  const { id } = req;
+  const {
+    userId: id,
+    menus = [] as number[],
+  }: { menus: number[]; userId: number } = req.body;
 
   //check if user exists
   const user = await UsersService.get(id);
   if (!user) return res.status(404).json({ message: "User not found" });
 
   //get menus from body
-  const { menus = [] as number[] }: { menus: number[] } = req.body;
 
   // Cast all values to number
   const menuIDs = menus.map(Number);

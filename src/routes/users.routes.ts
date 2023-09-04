@@ -15,12 +15,7 @@ router.post("/", isAuthenticated, UsersController.createUser);
 router.delete("/:id", isAuthenticated, isValidID, UsersController.deleteUser);
 router.put("/:id", isAuthenticated, isValidID, UsersController.updateUser);
 
-router.post(
-  "/:id/menus",
-  isAuthenticated,
-  isValidID,
-  UsersController.associateMenusToUser
-);
+router.post("/menus", isAuthenticated, UsersController.associateMenusToUser);
 router.get(
   "/:id/menus",
   isAuthenticated,

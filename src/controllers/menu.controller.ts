@@ -44,7 +44,10 @@ const nameSchema = zod
   .max(20);
 
 const createMenu: RequestHandler = async (req, res) => {
-  let { name }: { name: string | undefined } = req.body;
+  let {
+    name,
+    parentId,
+  }: { name: string | undefined; parentId: number | undefined } = req.body;
 
   try {
     name = nameSchema.parse(name);
@@ -66,8 +69,18 @@ const createMenu: RequestHandler = async (req, res) => {
         message: "Menu already exists",
       });
 
+    const parent = Number(parentId);
+
+    const payload: { name: string; parentId: null | number } = {
+      name,
+      parentId: null,
+    };
+    if (!isNaN(parent)) {
+      const existParent = await MenuService.get(parent);
+      if (existParent) payload.parentId = parent;
+    }
     //create menu in database
-    const menu = await MenuService.create({ name });
+    const menu = await MenuService.create(payload);
     return res.status(201).send(menu);
   } catch (error) {
     return res.status(500).send({

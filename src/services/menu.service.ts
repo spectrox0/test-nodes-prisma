@@ -1,8 +1,9 @@
-import { Menu } from "@/models";
+import { FullMenu, Menu } from "@/models";
 import { CommonService } from "@/types";
+import { buildMenuTree } from "@/utils/buildMenuTree";
 import { prisma } from "config";
 
-type Service = CommonService<Menu>;
+type Service = CommonService<Menu, FullMenu>;
 const create: Service["create"] = async payload => {
   //Create Menu in database with Prisma ORM
   const menu = await prisma.menu.create({
@@ -28,16 +29,27 @@ const update: Service["update"] = async (id, payload) => {
 };
 
 const get: Service["get"] = async (id, status = 1) => {
-  const menu = await prisma.menu.findUnique({ where: { id, status } });
-  return menu as Menu;
+  //Get the menu by id in database with ORM Prisma with its parent
+  const menu = await prisma.menu.findUnique({
+    where: { id, status },
+    select: { name: true, id: true, parent: true, parentId: true },
+  });
+  return menu as FullMenu;
 };
 
 const getAll: Service["getAll"] = async (status = 1) => {
   const menus = await prisma.menu.findMany({
     where: { status },
+    select: {
+      name: true,
+      id: true,
+      parent: true,
+      parentId: true,
+      status: true,
+    },
     orderBy: { parentId: "asc" },
   });
-  return menus as Menu[];
+  return buildMenuTree(menus as FullMenu[], null) as FullMenu[];
 };
 
 const getAllWithFilter = async (filter: string, status = 1) => {

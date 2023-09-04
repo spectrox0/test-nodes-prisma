@@ -1,8 +1,8 @@
 import { CommonService } from "@/types";
 import { prisma } from "config";
-import { Menu, User } from "models";
+import { FullUser, Menu, User } from "models";
 // Get the type of the service from the CommonService interface and the User model
-type Service = CommonService<User>;
+type Service = CommonService<User, FullUser>;
 
 const create: Service["create"] = async ({
   email,
@@ -55,7 +55,7 @@ const get: Service["get"] = async (id, status = 1) => {
       email: true,
     },
   });
-  return user as User;
+  return user as FullUser;
 };
 
 const getUserByField = async <T extends keyof User>(
@@ -101,7 +101,7 @@ const getAllUsers = async () => {
       email: true,
     },
   });
-  return users as User[];
+  return users as FullUser[];
 };
 
 const getAllUsersWithFilter = async (filter: string) => {
@@ -129,17 +129,21 @@ const getAllUsersWithFilter = async (filter: string) => {
   return users as User[];
 };
 
-const getAllMenusByUserId = async (id: number) => {
+const getAllMenusByUserId = async (id: number, filter?: string) => {
   //Get all menus by user id in DB with ORM Prisma
   const menus = await prisma.user
-    .findUnique({ where: { id }, select: { menusToUser: true } })
-    .menusToUser();
+    .findUnique({
+      where: { id },
+      select: { menusToUser: { select: { menu: true } } },
+    })
+    .then(user => user?.menusToUser.map(menu => menu.menu));
   if (!menus) throw new Error("Menus not found");
+
+  const filteredMenus = filter
+    ? menus.filter(menu => menu.name.includes(filter))
+    : menus;
   //Get all menus with the ids of the menusToUser
-  const menusToUser = await prisma.menu.findMany({
-    where: { id: { in: menus.map(menu => menu.menuId) } },
-  });
-  return menusToUser as Menu[];
+  return filteredMenus as Menu[];
 };
 
 const associateMenusToUser = async (id: number, menus: number[]) => {

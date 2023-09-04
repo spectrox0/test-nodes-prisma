@@ -31,6 +31,12 @@ make up-dev
 make migrate
 \`\`\`
 
+### Include the environment variables
+
+\`\`\`bash
+cat .env.example > .env
+\`\`\`
+
 #### Reset the Project (delete node_modules, reinstall, and rebuild project and Docker)
 
 \`\`\`bash

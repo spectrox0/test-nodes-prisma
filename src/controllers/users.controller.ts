@@ -1,8 +1,8 @@
 import { User } from "@/models";
+import MenuService from "@/services/menu.service";
 import UsersService from "@/services/users.service";
 import { hashPassword, signJwt } from "@/utils";
 import type { RequestHandler } from "express";
-import e from "express";
 import zod from "zod";
 
 // In this case for the validation of the fields we are going to use zod
@@ -37,12 +37,8 @@ const validation = {
 const schema = zod.object(validation);
 
 const getUser: RequestHandler = async (req, res) => {
-  const { id: id_ } = req.params;
-  // check if id is valid
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).json({ message: "Id is not valid" });
   try {
-    const user = await UsersService.get(id);
+    const user = await UsersService.get(req.id);
     if (!user) return res.status(404).json({ message: "User not found" });
     const { password: _, ...userWithoutPassword } = user;
     return res
@@ -55,8 +51,13 @@ const getUser: RequestHandler = async (req, res) => {
 };
 
 const getAllUsers: RequestHandler = async (req, res) => {
+  const { filter } = req.query;
+  if (typeof filter !== "string" && filter !== undefined)
+    return res.status(400).json({ message: "Filter must be string" });
   try {
-    const users = await UsersService.getAllUsers();
+    const users = await (filter
+      ? UsersService.getAllUsersWithFilter(filter)
+      : UsersService.getAllUsers());
     return res.status(200).json({ message: "Users found", data: users });
   } catch (error) {
     console.error(error);
@@ -109,13 +110,19 @@ const createUser: RequestHandler = async (req, res) => {
   }
 };
 
-const getMenuByUser: RequestHandler = async (req, res) => {};
+const getMenuByUser: RequestHandler = async (req, res) => {
+  const { id } = req;
+  try {
+    const menus = await UsersService.getAllMenusByUserId(id);
+    return res.status(200).send({ data: menus, message: "Menus found" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error gettings menus by user" });
+  }
+};
 
 const deleteUser: RequestHandler = async (req, res) => {
-  const { id: id_ } = req.params;
-  // check if id is valid
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).json({ message: "Id is not valid" });
+  const { id } = req;
   try {
     const user = await UsersService.get(id);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -130,10 +137,7 @@ const deleteUser: RequestHandler = async (req, res) => {
 const updateUser: RequestHandler = async (req, res) => {
   const { username, name, lastname, email, password } = req.body;
 
-  const { id: id_ } = req.params;
-  // check if id is valid
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).json({ message: "User is not valid" });
+  const { id } = req;
   const payload = {} as Partial<Omit<User, "id" | "status">>;
   //validate fields are not empty and email is valid format and password is strong enough and username is unique and email is unique with zod
   try {
@@ -161,7 +165,7 @@ const updateUser: RequestHandler = async (req, res) => {
   }
 
   try {
-    const userExist = await UsersService.get(Number(id));
+    const userExist = await UsersService.get(id);
     if (!userExist) return res.status(404).json({ message: "User not found" });
     //check if user with this email or user already exist
     const user = await UsersService.getUserByEmailOrUsername({
@@ -185,11 +189,51 @@ const updateUser: RequestHandler = async (req, res) => {
   }
 };
 
+const associateMenusToUser: RequestHandler = async (req, res) => {
+  const { id } = req;
+
+  //check if user exists
+  const user = await UsersService.get(id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  //get menus from body
+  const { menus = [] as number[] }: { menus: number[] } = req.body;
+
+  // Cast all values to number
+  const menuIDs = menus.map(Number);
+  //Check if all menus are valid
+  const invalidMenus = menuIDs.some(menu => isNaN(menu));
+  if (invalidMenus)
+    return res.status(400).json({ message: "Menus are not valid" });
+
+  try {
+    //Verify if the menus exist in database and are active and are not submenus of another menu
+    const menusExist =
+      (await MenuService.getListMenusByIds(menuIDs)).length === menus.length;
+
+    if (!menusExist) {
+      return res.status(400).json({ message: "Menus are not valid" });
+    }
+
+    const menusToUser = await UsersService.associateMenusToUser(id, menuIDs);
+    if (!menusToUser?.length) {
+      return res
+        .status(400)
+        .json({ message: "an error occurred while associating the menus" });
+    }
+  } catch (error) {
+    //Log error
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 const UsersController = Object.freeze({
   getUser,
   getAllUsers,
   createUser,
   getMenuByUser,
+  associateMenusToUser,
   deleteUser,
   updateUser,
 } as const satisfies Record<string, RequestHandler>);

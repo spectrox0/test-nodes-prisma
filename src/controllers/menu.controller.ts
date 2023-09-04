@@ -3,10 +3,7 @@ import zod from "zod";
 import type { RequestHandler } from "express";
 
 const getMenu: RequestHandler = async (req, res) => {
-  const { id: id_ } = req.params;
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
-
+  const { id } = req;
   //get menu from database
   try {
     const menu = await MenuService.get(id);
@@ -23,8 +20,16 @@ const getMenu: RequestHandler = async (req, res) => {
 };
 
 const getAllMenus: RequestHandler = async (req, res) => {
+  //Get Params filter
+  const { filter } = req.query;
+  if (typeof filter !== "string" && filter !== undefined)
+    return res.status(400).send({
+      message: "Filter must be string",
+    });
   try {
-    const menus = await MenuService.getAll();
+    const menus = await (filter
+      ? MenuService.getAllWithFilter(filter)
+      : MenuService.getAll());
     return res.status(200).send({ message: "Menus found", data: menus });
   } catch (error) {
     return res.status(500).send({
@@ -72,10 +77,7 @@ const createMenu: RequestHandler = async (req, res) => {
 };
 
 const deleteMenu: RequestHandler = async (req, res) => {
-  const { id: id_ } = req.params;
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
-
+  const { id } = req;
   try {
     //check if the menu exists  in database
     const menu = await MenuService.get(id);
@@ -95,11 +97,8 @@ const deleteMenu: RequestHandler = async (req, res) => {
 };
 
 const updateMenu: RequestHandler = async (req, res) => {
-  const { id: id_ } = req.params;
-  const id = Number(id_);
-  if (isNaN(id)) return res.status(400).send({ message: "Id is not valid" });
-
   let { name }: { name: string | undefined } = req.body;
+  const { id } = req;
 
   try {
     name = nameSchema.parse(name);

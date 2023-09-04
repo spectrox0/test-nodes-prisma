@@ -33,13 +33,33 @@ const get: Service["get"] = async (id, status = 1) => {
 };
 
 const getAll: Service["getAll"] = async (status = 1) => {
-  const menus = await prisma.menu.findMany({ where: { status } });
+  const menus = await prisma.menu.findMany({
+    where: { status },
+    orderBy: { parentId: "asc" },
+  });
+  return menus as Menu[];
+};
+
+const getAllWithFilter = async (filter: string, status = 1) => {
+  //Get all menus with filter in the name with ORM Prisma and sort by parent null first
+  const menus = await prisma.menu.findMany({
+    where: { name: { contains: filter }, status },
+    orderBy: { parentId: "asc" },
+  });
   return menus as Menu[];
 };
 
 export const getMenuByName = async (name: string) => {
   const menu = await prisma.menu.findUnique({ where: { name } });
   return menu as Menu;
+};
+
+//GetListMenusByIds in prisma
+export const getListMenusByIds = async (ids: number[]) => {
+  const menus = await prisma.menu.findMany({
+    where: { id: { in: ids }, status: 1, parentId: null },
+  });
+  return menus as Menu[];
 };
 
 //Singleton pattern
@@ -49,7 +69,9 @@ const MenuService = Object.freeze({
   update,
   get,
   getAll,
+  getAllWithFilter,
   getMenuByName,
+  getListMenusByIds,
 });
 
 export default MenuService;

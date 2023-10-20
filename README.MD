@@ -1,4 +1,4 @@
-# TEST API | OPRATEL
+# TEST API
 
 ## Description
 
